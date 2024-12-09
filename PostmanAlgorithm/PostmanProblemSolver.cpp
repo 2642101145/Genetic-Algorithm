@@ -1,11 +1,83 @@
 #include "PostmanProblemSolver.h"
 
-PostmanProblemSolver *PostmanProblemSolver::instance = nullptr;
+
+PostmanProblemSolver::PostmanProblemSolver(const uint32_t & point_num) {
+    random_device rd;
+    gen = std::mt19937(rd());
+    if (point_num < 2) {
+    throw std::invalid_argument("point_num must be at least 2");
+    }
+
+    for (uint32_t i = 0; i < point_num; ++i) {
+        allPoint.push_back(static_cast<char>('A' + i));
+    }
+
+    //生成随机矩阵
+    uint32_t n = allPoint.size();
+    distanceMatrix = std::vector<std::vector<uint32_t>>(n, std::vector<uint32_t>(n, 0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            auto randomValue = PostmanProblemSolver::GetRandomNum(1, 30);
+            distanceMatrix[i][j] = randomValue;
+            distanceMatrix[j][i] = randomValue;  // 沿对角线对称
+        }
+    }
+
+    //初始化最优路径长度
+    best_path.total_distance = 0;
+
+}
+
+
+PostmanProblemSolver::PostmanProblemSolver(string & param)
+{
+    random_device rd;
+    gen = std::mt19937(rd());
+
+    if(param =="LiaoNing")
+    {
+        //辽宁6市旅游最短路径
+        distanceMatrix = {
+                {0,400,300,450,420,380},
+                {400,0,100,80,120,220},
+                {300,100,0,60,80,180},
+                {450,80,60,0,50,160},
+                {420,120,80,50,0,140},
+                {380,220,180,160,140,0}
+        };
+        // 插入键值对，将字符与对应的城市名称关联起来
+        string_map['A'] = "大连";
+        string_map['B'] = "沈阳";
+        string_map['C'] = "鞍山";
+        string_map['D'] = "抚顺";
+        string_map['E'] = "本溪";
+        string_map['F'] = "锦州";
+    }
+
+    for (uint32_t i = 0; i < distanceMatrix.size(); ++i) {
+        allPoint.push_back(static_cast<char>('A' + i));
+    }
+
+    //初始化最优路径长度
+    best_path.total_distance = 0;
+}
+
+PostmanProblemSolver::PostmanProblemSolver(const vector<vector<uint32_t>> & distanceMatrix)
+{
+    random_device rd;
+    gen = std::mt19937(rd());
+    //固定矩阵26*26演示
+    this->distanceMatrix = distanceMatrix;
+    for (uint32_t i = 0; i < distanceMatrix.size(); ++i) {
+        allPoint.push_back(static_cast<char>('A' + i));
+    }
+    //初始化最优路径长度
+    best_path.total_distance = 0;
+}
 
 PostmanProblemSolver::PostmanProblemSolver(const std::vector<char> &points) : allPoint(points) {
 
-    random_device rd;
-    gen = std::mt19937(rd());
+
 
     //随机矩阵
     uint32_t n = allPoint.size();
@@ -49,32 +121,10 @@ PostmanProblemSolver::PostmanProblemSolver(const std::vector<char> &points) : al
 //            { 4 , 4 , 7 , 9 , 6 , 1 , 2 , 3 , 1 , 1 , 7 , 3 , 3 , 8 , 3 , 9 , 2 , 4 , 4 , 3 , 8 , 5 , 6 , 6 , 7 , 0 }
 //    };
 
-    //辽宁6市旅游最短路径
-    /*distanceMatrix = {
-            {0,400,300,450,420,380},
-            {400,0,100,80,120,220},
-            {300,100,0,60,80,180},
-            {450,80,60,0,50,160},
-            {420,120,80,50,0,140},
-            {380,220,180,160,140,0}
-    };
-    // 插入键值对，将字符与对应的城市名称关联起来
-    string_map['A'] = "大连";
-    string_map['B'] = "沈阳";
-    string_map['C'] = "鞍山";
-    string_map['D'] = "抚顺";
-    string_map['E'] = "本溪";
-    string_map['F'] = "锦州";*/
+
 
     //初始化最优路径长度
     best_path.total_distance = 0;
-}
-
-PostmanProblemSolver *PostmanProblemSolver::getInstance(const std::vector<char> &points) {
-    if (instance == nullptr) {
-        instance = new PostmanProblemSolver(points);
-    }
-    return instance;
 }
 
 uint32_t PostmanProblemSolver::GetPointIdx(const char &point) {
@@ -402,3 +452,5 @@ void PostmanProblemSolver::PrintBestPath() {
 uint32_t PostmanProblemSolver::GetBestPathTotalDistance() {
     return best_path.total_distance;
 }
+
+
