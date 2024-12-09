@@ -1,8 +1,8 @@
 #include "PostmanProblemSolver.h"
 
-PostmanProblemSolver* PostmanProblemSolver::instance = nullptr;
+PostmanProblemSolver *PostmanProblemSolver::instance = nullptr;
 
-PostmanProblemSolver::PostmanProblemSolver(const std::vector<char>& points) : allPoint(points) {
+PostmanProblemSolver::PostmanProblemSolver(const std::vector<char> &points) : allPoint(points) {
 
     random_device rd;
     gen = std::mt19937(rd());
@@ -70,56 +70,55 @@ PostmanProblemSolver::PostmanProblemSolver(const std::vector<char>& points) : al
     best_path.total_distance = 0;
 }
 
-PostmanProblemSolver* PostmanProblemSolver::getInstance(const std::vector<char>& points) {
+PostmanProblemSolver *PostmanProblemSolver::getInstance(const std::vector<char> &points) {
     if (instance == nullptr) {
         instance = new PostmanProblemSolver(points);
     }
     return instance;
 }
 
-uint32_t PostmanProblemSolver::GetPointIdx(const char& point) {
+uint32_t PostmanProblemSolver::GetPointIdx(const char &point) {
     return point - 65;
 }
 
-uint32_t PostmanProblemSolver::GetDistance(const char& point1, const char& point2) const {
+uint32_t PostmanProblemSolver::GetDistance(const char &point1, const char &point2) const {
 
     return distanceMatrix.at(GetPointIdx(point1)).at(GetPointIdx(point2));
 }
 
-void PostmanProblemSolver::PrintDistance(const char& point1, const char& point2) const {
+void PostmanProblemSolver::PrintDistance(const char &point1, const char &point2) const {
     std::cout << point1 << "<------" << GetDistance(point1, point2) << "------>" << point2 << std::endl;
 }
 
 void PostmanProblemSolver::PrintMatrix() const {
-    for (const auto& row : distanceMatrix) {
-        for (auto value : row) {
+    for (const auto &row: distanceMatrix) {
+        for (auto value: row) {
             std::cout << value << " | ";
         }
         std::cout << std::endl;
     }
-    cout<<"----------------"<<endl;
+    cout << "----------------" << endl;
 }
 
-uint32_t PostmanProblemSolver::GetRandomNum(const int& min, const int& max) {
+uint32_t PostmanProblemSolver::GetRandomNum(const int &min, const int &max) {
     std::uniform_int_distribution<> dis(min, max);
     return dis(gen);
 }
 
-double PostmanProblemSolver::GetRandomNum(const double& min, const double& max) {
+double PostmanProblemSolver::GetRandomNum(const double &min, const double &max) {
     std::uniform_real_distribution<double> dis(min, max);
     return dis(gen);
 }
 
 void PostmanProblemSolver::CreatPathIdx(uint32_t creat_num) {
 
-    while(creat_num--)
-    {
+    while (creat_num--) {
         Path path;
         path.total_distance = 0;
         vector<uint32_t> path_idx_temp;
-        vector<char>path_temp;
-        vector<char> allPointTemp =allPoint;
-        int point_num = allPoint.size()-1;
+        vector<char> path_temp;
+        vector<char> allPointTemp = allPoint;
+        int point_num = allPoint.size() - 1;
 
 
         //设置路程起点
@@ -128,80 +127,75 @@ void PostmanProblemSolver::CreatPathIdx(uint32_t creat_num) {
         char creat_point = allPointTemp.at(begin_point_idx);
         path_temp.push_back(creat_point);
         char begin_point = creat_point;
-        std::vector<char>::iterator it = allPointTemp.begin()+begin_point_idx;
+        std::vector<char>::iterator it = allPointTemp.begin() + begin_point_idx;
         allPointTemp.erase(it);
 
         //设置路程点
         char before_point = begin_point;
-        do
-        {
+        do {
             //生成索引
-            auto idx = GetRandomNum(0,--point_num);
+            auto idx = GetRandomNum(0, --point_num);
             path_idx_temp.push_back(idx);
             //生成路径
             creat_point = allPointTemp.at(idx);
             path_temp.push_back(creat_point);
-            it = allPointTemp.begin()+idx;
+            it = allPointTemp.begin() + idx;
             allPointTemp.erase(it);
-            path.total_distance+=GetDistance(before_point,creat_point);
+            path.total_distance += GetDistance(before_point, creat_point);
             before_point = creat_point;
-        }
-        while (point_num>0);
+        } while (point_num > 0);
 
         //计算终点返回起点距离
-        path.total_distance+=GetDistance(begin_point,creat_point);
-        path.fitness = 1.0/path.total_distance;
+        path.total_distance += GetDistance(begin_point, creat_point);
+        path.fitness = 1.0 / path.total_distance;
 
         //放入索引和路径
-        path.path_idx=path_idx_temp;
+        path.path_idx = path_idx_temp;
         path.path = path_temp;
         paths.push_back(path);
-        if(best_path.total_distance==0)
-        {
+        if (best_path.total_distance == 0) {
             best_path = path;
-        }
-        else if(best_path.total_distance>path.total_distance)
-        {
+        } else if (best_path.total_distance > path.total_distance) {
             best_path = path;
         }
     }
 }
 
-void PostmanProblemSolver::PrintPathIdx() const{
-    for (const auto& row : paths) {
-        for (auto element : row.path_idx) {
+void PostmanProblemSolver::PrintPathIdx() const {
+    for (const auto &row: paths) {
+        for (auto element: row.path_idx) {
             std::cout << element << " ";
         }
         std::cout << std::endl;
     }
-    cout<<"----------------"<<endl;
+    cout << "----------------" << endl;
 }
 
-void PostmanProblemSolver::PrintPath() const{
+void PostmanProblemSolver::PrintPath() const {
 
-    for (const auto& row : paths) {
-        vector<char> allPointTemp =allPoint;
-        for (auto element : row.path) {
+    for (const auto &row: paths) {
+        vector<char> allPointTemp = allPoint;
+        for (auto element: row.path) {
             std::cout << element << " ";
         }
-        cout<<" "<<row.total_distance;
+        cout << " " << row.total_distance;
         std::cout << std::endl;
     }
-    cout<<"----------------"<<endl;
+    cout << "----------------" << endl;
 }
 
-void PostmanProblemSolver::PrintMapPath() const{
+void PostmanProblemSolver::PrintMapPath() const {
 
-    for (const auto& row : paths) {
-        vector<char> allPointTemp =allPoint;
-        for (auto element : row.path) {
+    for (const auto &row: paths) {
+        vector<char> allPointTemp = allPoint;
+        for (auto element: row.path) {
             auto it = string_map.find(element);
             std::cout << (it->second) << " ";
         }
-        cout<<" "<<row.total_distance;
+        cout << " " << row.total_distance;
         std::cout << std::endl;
     }
-    cout<<"----------------"<<endl;
+    cout << "----------------" << endl;
 }
 
 void PostmanProblemSolver::ChosePath() {
@@ -212,32 +206,20 @@ void PostmanProblemSolver::ChosePath() {
     vector<Path> new_paths;
     vector<Path> min_paths;
     uint32_t min_total_distance = paths.at(0).total_distance;
-    for(auto path:paths)
-    {
+    for (auto path: paths) {
         //将最短路径放入队列，不进行筛选
-        if(path.total_distance <= min_total_distance)
-        {
-            //查找到新的最小数
-            if(path.total_distance<min_total_distance)
-            {
-                for(auto min_path:min_paths)
-                {
-                    total_fitness+=min_path.fitness;
-                    cumulative_probabilities.push_back(total_fitness);
-                    new_paths.push_back(min_path);
-                }
-                min_paths.clear();
-                min_paths.push_back(path);
-                min_total_distance = path.total_distance;
+        //查找到新的最小数
+        if (path.total_distance < min_total_distance) {
+            for (auto min_path: min_paths) {
+                total_fitness += min_path.fitness;
+                cumulative_probabilities.push_back(total_fitness);
+                new_paths.push_back(min_path);
             }
-            else
-            {
-                min_paths.push_back(path);
-            }
-        }
-        else
-        {
-            total_fitness+=path.fitness;
+            min_paths.clear();
+            min_paths.push_back(path);
+            min_total_distance = path.total_distance;
+        } else {
+            total_fitness += path.fitness;
             cumulative_probabilities.push_back(total_fitness);
             new_paths.push_back(path);
         }
@@ -245,11 +227,9 @@ void PostmanProblemSolver::ChosePath() {
 
     paths.clear();
     //将当前最优解存入队列中
-    paths.insert(paths.end(),min_paths.begin(),min_paths.end());
-    if(min_paths.size()!=0)
-    {
-        if(best_path.total_distance>min_paths.at(0).total_distance)
-        {
+    paths.insert(paths.end(), min_paths.begin(), min_paths.end());
+    if (min_paths.size() != 0) {
+        if (best_path.total_distance > min_paths.at(0).total_distance) {
             best_path = min_paths.at(0);
         }
     }
@@ -258,9 +238,8 @@ void PostmanProblemSolver::ChosePath() {
     auto loop = new_paths.size();
 
     double random = 0.0;
-    for(auto path_mem : new_paths)
-    {
-        random = GetRandomNum(0.0,cumulative_probabilities.back());
+    for (auto path_mem: new_paths) {
+        random = GetRandomNum(0.0, cumulative_probabilities.back());
         auto it = lower_bound(cumulative_probabilities.begin(), cumulative_probabilities.end(), random);
         size_t index = distance(cumulative_probabilities.begin(), it);
         paths.push_back(new_paths.at(index));
@@ -276,62 +255,46 @@ void PostmanProblemSolver::Hybrid() {
 
     auto min_total_distance = paths.at(0).total_distance;
 
-    for(auto path: paths)
-    {
+    for (auto path: paths) {
         //最优解不参与杂交
-        if(path.total_distance <= min_total_distance)
-        {
-            //查找到新的最小数
-            if(path.total_distance<min_total_distance)
-            {
-                for(auto min_path:min_paths)
-                {
-                    hybrid_paths.push_back(min_path);
-                }
-                min_paths.clear();
-                min_paths.push_back(path);
-                min_total_distance = path.total_distance;
+        //查找到新的最小数
+        if (path.total_distance < min_total_distance) {
+            for (auto min_path: min_paths) {
+                hybrid_paths.push_back(min_path);
             }
-            else
-            {
-                min_paths.push_back(path);
-            }
-        } else
-        {
+            min_paths.clear();
+            min_paths.push_back(path);
+            min_total_distance = path.total_distance;
+        } else {
             hybrid_paths.push_back(path);
         }
     }
 
     paths.clear();
     //将当前最优解存入队列中
-    paths.insert(paths.end(),min_paths.begin(),min_paths.end());
+    paths.insert(paths.end(), min_paths.begin(), min_paths.end());
     //只有一个待杂交路径，直接放弃杂交
-    if(hybrid_paths.size()==1)
-    {
+    if (hybrid_paths.size() == 1) {
         paths.push_back(hybrid_paths.at(0));
-    }else if(hybrid_paths.size()%2 != 0 && hybrid_paths.size()!=0) {
-        auto it = hybrid_paths.end()-1;
+    } else if (hybrid_paths.size() % 2 != 0 && hybrid_paths.size() != 0) {
+        auto it = hybrid_paths.end() - 1;
         paths.push_back(*it);
         hybrid_paths.erase(it);
     }
     //开始杂交
-    if(hybrid_paths.size()>1)
-    {
-        for(auto idx = 0;idx<hybrid_paths.size();idx+=2)
-        {
-            auto & path_a = hybrid_paths.at(idx);
-            auto & path_b = hybrid_paths.at(idx+1);
+    if (hybrid_paths.size() > 1) {
+        for (auto idx = 0; idx < hybrid_paths.size(); idx += 2) {
+            auto &path_a = hybrid_paths.at(idx);
+            auto &path_b = hybrid_paths.at(idx + 1);
             //总里程相等不杂交
-            if(path_a.total_distance==path_b.total_distance)
-            {
+            if (path_a.total_distance == path_b.total_distance) {
                 paths.push_back(path_a);
                 paths.push_back(path_b);
                 continue;
             }
             //从第random位交换
-            auto random = GetRandomNum(1,allPoint.size()-1);
-            for(;random<allPoint.size();random++)
-            {
+            auto random = GetRandomNum(1, allPoint.size() - 1);
+            for (; random < allPoint.size(); random++) {
                 auto temp_idx = path_a.path_idx.at(random);
                 path_a.path_idx.at(random) = path_b.path_idx.at(random);
                 path_b.path_idx.at(random) = temp_idx;
@@ -343,64 +306,48 @@ void PostmanProblemSolver::Hybrid() {
         }
 
     }
-
-
-
 }
 
 void PostmanProblemSolver::Mutation(const uint32_t &prob, const uint32_t &prob_total) {
     vector<Path> min_paths;
     vector<Path> mutation_paths;
     auto min_total_distance = paths.at(0).total_distance;
-    for(auto path: paths)
-    {
+    for (auto path: paths) {
         //最优解不参与杂交
-        if(path.total_distance <= min_total_distance)
-        {
-            //查找到新的最小数
-            if(path.total_distance<min_total_distance)
-            {
-                for(auto min_path:min_paths)
-                {
-                    mutation_paths.push_back(min_path);
-                }
-                min_paths.clear();
-                min_paths.push_back(path);
-                min_total_distance = path.total_distance;
+        //查找到新的最小数
+        if (path.total_distance < min_total_distance) {
+            for (auto min_path: min_paths) {
+                mutation_paths.push_back(min_path);
             }
-            else
-            {
-                min_paths.push_back(path);
-            }
-        } else
-        {
+            min_paths.clear();
+            min_paths.push_back(path);
+            min_total_distance = path.total_distance;
+        } else {
             mutation_paths.push_back(path);
         }
     }
 
     paths.clear();
     //将当前最优解存入队列中
-    paths.insert(paths.end(),min_paths.begin(),min_paths.end());
+    paths.insert(paths.end(), min_paths.begin(), min_paths.end());
 
-    for(auto idx = 0;idx<mutation_paths.size();idx++)
-    {
-        auto random = GetRandomNum(1,prob_total);
-        Path & path = mutation_paths.at(idx);
-        if(random>prob)//不变异
+    for (auto idx = 0; idx < mutation_paths.size(); idx++) {
+        auto random = GetRandomNum(1, prob_total);
+        Path &path = mutation_paths.at(idx);
+        if (random > prob)//不变异
         {
             paths.push_back(path);
             continue;
         }
         //获取变异索引位点，起点不能改变
-        random = GetRandomNum(1,allPoint.size()-1);
+        random = GetRandomNum(1, allPoint.size() - 1);
 
 
-        while (random<allPoint.size())
-        {
+        while (random < allPoint.size()) {
             try {
                 auto new_point_idx = GetRandomNum(0, allPoint.size() - 1 - random);
                 path.path_idx.at(random) = new_point_idx;
-            } catch (const std::out_of_range& e) {
+            } catch (const std::out_of_range &e) {
                 std::cerr << "在Mutation函数中出现越界访问: " << e.what() << std::endl;
                 // 可以根据情况选择合适的处理方式，比如直接返回、修正索引等
                 return;
@@ -413,7 +360,7 @@ void PostmanProblemSolver::Mutation(const uint32_t &prob, const uint32_t &prob_t
 }
 
 void PostmanProblemSolver::ResetPathWhenNewIdxGet(Path &path) {
-    const vector<uint32_t >  & path_idx = path.path_idx;
+    const vector<uint32_t> &path_idx = path.path_idx;
     path.total_distance = 0;
     path.fitness = 0;
     path.path.clear();
@@ -421,37 +368,35 @@ void PostmanProblemSolver::ResetPathWhenNewIdxGet(Path &path) {
 
     path.path.push_back(*allPointTemp.begin());
     //擦除起点
-    auto it =allPointTemp.begin();
+    auto it = allPointTemp.begin();
     allPointTemp.erase(it);
 
     //设置上一路程点
-    for(auto idx = 1;idx<path_idx.size();idx++)
-    {
-        it = allPointTemp.begin()+path_idx.at(idx);
+    for (auto idx = 1; idx < path_idx.size(); idx++) {
+        it = allPointTemp.begin() + path_idx.at(idx);
         path.path.push_back(*it);
-        path.total_distance+= GetDistance(path.path.at(idx-1),path.path.at(idx));
+        path.total_distance += GetDistance(path.path.at(idx - 1), path.path.at(idx));
         allPointTemp.erase(it);
     }
     //计算终点返回起点距离
-    path.total_distance+=GetDistance(*path.path.begin(),path.path.back());
+    path.total_distance += GetDistance(*path.path.begin(), path.path.back());
 
-    path.fitness = 1.0/path.total_distance;
+    path.fitness = 1.0 / path.total_distance;
 
-    if(best_path.total_distance > path.total_distance)
-    {
+    if (best_path.total_distance > path.total_distance) {
         best_path = path;
     }
 
 }
 
 void PostmanProblemSolver::PrintBestPath() {
-    vector<char> allPointTemp =allPoint;
-    for (auto element : best_path.path) {
+    vector<char> allPointTemp = allPoint;
+    for (auto element: best_path.path) {
         std::cout << element << " ";
     }
-    cout<<" "<<best_path.total_distance;
+    cout << " " << best_path.total_distance;
     std::cout << std::endl;
-    cout<<"----------------"<<endl;
+    cout << "----------------" << endl;
 }
 
 uint32_t PostmanProblemSolver::GetBestPathTotalDistance() {

@@ -49,13 +49,12 @@ int main() {
                 continue;
             }
         }
-
-
     }
     while(loop--);
 
     cout<<"---------最终解------------"<<endl;
     solver->PrintBestPath();
+    solver->PrintPath();
     //solver->PrintMapPath();
 
     return 0;
