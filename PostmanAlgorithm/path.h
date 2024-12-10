@@ -8,6 +8,8 @@
 #include <cstdint>
 #include "iostream"
 #include "vector"
+
+
 using namespace std;
 struct Path
 {
@@ -18,7 +20,7 @@ struct Path
     // 路径索引实例
     vector<uint32_t > path_idx;
     //路径实例
-    vector<char> path;
+    vector<uint32_t> path;
 };
 
 struct BestPath

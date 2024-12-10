@@ -12,13 +12,14 @@
 #include <map>
 #include <memory>
 #include "path.h"
+#include <string>
 
 using namespace std;
 
 class PostmanProblemSolver {
 private:
     // 存储所有节点（这里以字符表示）的向量，用于映射索引和字符
-    vector<char> allPoint;
+    vector<uint32_t> allPoint;
     // 存储节点间距离的对称矩阵
     vector<vector<uint32_t>> distanceMatrix;
     // 私有构造函数，防止外部直接实例化，参数用于接收节点字符向量,首字符永远为起点
@@ -26,9 +27,10 @@ private:
     vector<Path> paths;
     // 当前最优解
     Path best_path;
-    // 地图对应用
-    map<char,string> string_map;
+    // 地图对应输出
+    map<uint32_t ,string> out_put_string_map;
     mt19937 gen;
+    void SetOutPutMap(const uint32_t map_size);
 
 public:
     //初始化
@@ -41,13 +43,13 @@ public:
     //根据固定的矩阵进行计算
     PostmanProblemSolver(const vector<vector<uint32_t>> & distanceMatrix);
     //传入连续路径点
-    PostmanProblemSolver(const std::vector<char> &points);
+    PostmanProblemSolver(const std::vector<uint32_t> &points);
     // 根据节点字符获取其在allPoint中的索引
-    static uint32_t GetPointIdx(const char& point);
+    //static uint32_t GetPointIdx(const char& point);
     // 获取两个节点之间的距离（通过矩阵中对应索引位置的值）
-    uint32_t GetDistance(const char& point1, const char& point2) const;
+    uint32_t GetDistance(const uint32_t & point1, const uint32_t& point2) const;
     // 打印两个节点之间的距离信息
-    void PrintDistance(const char& point1, const char& point2) const;
+    void PrintDistance(const uint32_t& point1, const uint32_t& point2) const;
     // 打印矩阵
     void PrintMatrix() const;
     // 生成[min, max]范围的随机数
@@ -59,8 +61,8 @@ public:
     void PrintPathIdx() const;
     // 打印路径实例
     void PrintPath() const;
-    // 杂交操作
-    void Hybrid();
+    // 杂交操作, 输入概率分子和分母
+    void Hybrid(const uint32_t &prob, const uint32_t &prob_total);
     // 突变操作，输入概率分子和分母
     void Mutation(const uint32_t &prob, const uint32_t &prob_total);
     // 选择操作
@@ -68,7 +70,6 @@ public:
     // 获取当前最优路径
     void PrintBestPath();
     uint32_t GetBestPathTotalDistance();
-    void PrintMapPath() const;
     //重新设置路径总长度和路径实例
     void ResetPathWhenNewIdxGet(Path &path);
 };

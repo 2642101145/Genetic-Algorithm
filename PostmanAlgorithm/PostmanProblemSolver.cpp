@@ -9,7 +9,7 @@ PostmanProblemSolver::PostmanProblemSolver(const uint32_t & point_num) {
     }
 
     for (uint32_t i = 0; i < point_num; ++i) {
-        allPoint.push_back(static_cast<char>('A' + i));
+        allPoint.push_back(i);
     }
 
     //生成随机矩阵
@@ -17,11 +17,14 @@ PostmanProblemSolver::PostmanProblemSolver(const uint32_t & point_num) {
     distanceMatrix = std::vector<std::vector<uint32_t>>(n, std::vector<uint32_t>(n, 0));
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
-            auto randomValue = PostmanProblemSolver::GetRandomNum(1, 30);
+            auto randomValue = PostmanProblemSolver::GetRandomNum(1, 9);
             distanceMatrix[i][j] = randomValue;
             distanceMatrix[j][i] = randomValue;  // 沿对角线对称
         }
     }
+
+    //初始化打印值
+    SetOutPutMap(n);
 
     //初始化最优路径长度
     best_path.total_distance = 0;
@@ -46,16 +49,16 @@ PostmanProblemSolver::PostmanProblemSolver(string & param)
                 {380,220,180,160,140,0}
         };
         // 插入键值对，将字符与对应的城市名称关联起来
-        string_map['A'] = "大连";
-        string_map['B'] = "沈阳";
-        string_map['C'] = "鞍山";
-        string_map['D'] = "抚顺";
-        string_map['E'] = "本溪";
-        string_map['F'] = "锦州";
+        out_put_string_map[0] = "大连";
+        out_put_string_map[1] = "沈阳";
+        out_put_string_map[2] = "鞍山";
+        out_put_string_map[3] = "抚顺";
+        out_put_string_map[4] = "本溪";
+        out_put_string_map[5] = "锦州";
     }
 
     for (uint32_t i = 0; i < distanceMatrix.size(); ++i) {
-        allPoint.push_back(static_cast<char>('A' + i));
+        allPoint.push_back(i);
     }
 
     //初始化最优路径长度
@@ -69,15 +72,16 @@ PostmanProblemSolver::PostmanProblemSolver(const vector<vector<uint32_t>> & dist
     //固定矩阵26*26演示
     this->distanceMatrix = distanceMatrix;
     for (uint32_t i = 0; i < distanceMatrix.size(); ++i) {
-        allPoint.push_back(static_cast<char>('A' + i));
+        allPoint.push_back(i);
     }
+
+    //初始化打印值
+    SetOutPutMap(distanceMatrix.size());
     //初始化最优路径长度
     best_path.total_distance = 0;
 }
 
-PostmanProblemSolver::PostmanProblemSolver(const std::vector<char> &points) : allPoint(points) {
-
-
+PostmanProblemSolver::PostmanProblemSolver(const std::vector<uint32_t> &points) : allPoint(points) {
 
     //随机矩阵
     uint32_t n = allPoint.size();
@@ -90,54 +94,19 @@ PostmanProblemSolver::PostmanProblemSolver(const std::vector<char> &points) : al
         }
     }
 
-
-    //固定矩阵26*26演示
-//    distanceMatrix = {
-//            { 0 , 1 , 7 , 3 , 6 , 9 , 3 , 6 , 4 , 6 , 2 , 4 , 3 , 1 , 6 , 1 , 3 , 7 , 1 , 2 , 5 , 2 , 3 , 1 , 4 , 4 },
-//            { 1 , 0 , 2 , 8 , 5 , 4 , 5 , 7 , 6 , 9 , 2 , 8 , 1 , 4 , 3 , 2 , 3 , 4 , 3 , 2 , 7 , 3 , 3 , 9 , 6 , 4 },
-//            { 7 , 2 , 0 , 6 , 6 , 2 , 8 , 9 , 4 , 6 , 2 , 9 , 1 , 5 , 6 , 6 , 7 , 6 , 8 , 7 , 1 , 4 , 5 , 1 , 9 , 7 },
-//            { 3 , 8 , 6 , 0 , 1 , 1 , 6 , 7 , 7 , 9 , 3 , 4 , 6 , 3 , 6 , 5 , 5 , 7 , 5 , 2 , 1 , 2 , 7 , 4 , 5 , 9 },
-//            { 6 , 5 , 6 , 1 , 0 , 8 , 7 , 4 , 1 , 4 , 1 , 5 , 1 , 7 , 4 , 6 , 8 , 7 , 6 , 7 , 9 , 6 , 4 , 2 , 8 , 6 },
-//            { 9 , 4 , 2 , 1 , 8 , 0 , 3 , 8 , 4 , 3 , 4 , 6 , 2 , 2 , 7 , 9 , 5 , 6 , 4 , 7 , 4 , 9 , 5 , 4 , 9 , 1 },
-//            { 3 , 5 , 8 , 6 , 7 , 3 , 0 , 9 , 2 , 1 , 8 , 2 , 2 , 4 , 4 , 5 , 6 , 9 , 5 , 6 , 4 , 4 , 4 , 9 , 5 , 2 },
-//            { 6 , 7 , 9 , 7 , 4 , 8 , 9 , 0 , 6 , 1 , 6 , 6 , 5 , 4 , 9 , 6 , 8 , 4 , 8 , 4 , 5 , 9 , 1 , 4 , 8 , 3 },
-//            { 4 , 6 , 4 , 7 , 1 , 4 , 2 , 6 , 0 , 5 , 5 , 9 , 3 , 3 , 3 , 9 , 9 , 8 , 6 , 1 , 4 , 4 , 8 , 9 , 8 , 1 },
-//            { 6 , 9 , 6 , 9 , 4 , 3 , 1 , 1 , 5 , 0 , 3 , 1 , 9 , 1 , 4 , 2 , 3 , 8 , 3 , 9 , 2 , 9 , 7 , 4 , 7 , 1 },
-//            { 2 , 2 , 2 , 3 , 1 , 4 , 8 , 6 , 5 , 3 , 0 , 8 , 7 , 9 , 8 , 3 , 1 , 8 , 6 , 8 , 1 , 7 , 8 , 8 , 1 , 7 },
-//            { 4 , 8 , 9 , 4 , 5 , 6 , 2 , 6 , 9 , 1 , 8 , 0 , 3 , 6 , 3 , 9 , 1 , 1 , 3 , 2 , 5 , 9 , 7 , 6 , 7 , 3 },
-//            { 3 , 1 , 1 , 6 , 1 , 2 , 2 , 5 , 3 , 9 , 7 , 3 , 0 , 2 , 9 , 8 , 6 , 7 , 8 , 4 , 3 , 5 , 7 , 8 , 4 , 3 },
-//            { 1 , 4 , 5 , 3 , 7 , 2 , 4 , 4 , 3 , 1 , 9 , 6 , 2 , 0 , 5 , 3 , 8 , 7 , 7 , 3 , 6 , 6 , 2 , 6 , 8 , 8 },
-//            { 6 , 3 , 6 , 6 , 4 , 7 , 4 , 9 , 3 , 4 , 8 , 3 , 9 , 5 , 0 , 6 , 9 , 7 , 3 , 7 , 5 , 7 , 1 , 8 , 2 , 3 },
-//            { 1 , 2 , 6 , 5 , 6 , 9 , 5 , 6 , 9 , 2 , 3 , 9 , 8 , 3 , 6 , 0 , 6 , 6 , 5 , 5 , 4 , 1 , 3 , 5 , 1 , 9 },
-//            { 3 , 3 , 7 , 5 , 8 , 5 , 6 , 8 , 9 , 3 , 1 , 1 , 6 , 8 , 9 , 6 , 0 , 4 , 6 , 7 , 7 , 1 , 8 , 2 , 3 , 2 },
-//            { 7 , 4 , 6 , 7 , 7 , 6 , 9 , 4 , 8 , 8 , 8 , 1 , 7 , 7 , 7 , 6 , 4 , 0 , 9 , 7 , 6 , 6 , 4 , 5 , 3 , 4 },
-//            { 1 , 3 , 8 , 5 , 6 , 4 , 5 , 8 , 6 , 3 , 6 , 3 , 8 , 7 , 3 , 5 , 6 , 9 , 0 , 3 , 4 , 8 , 1 , 2 , 7 , 4 },
-//            { 2 , 2 , 7 , 2 , 7 , 7 , 6 , 4 , 1 , 9 , 8 , 2 , 4 , 3 , 7 , 5 , 7 , 7 , 3 , 0 , 3 , 8 , 4 , 5 , 9 , 3 },
-//            { 5 , 7 , 1 , 1 , 9 , 4 , 4 , 5 , 4 , 2 , 1 , 5 , 3 , 6 , 5 , 4 , 7 , 6 , 4 , 3 , 0 , 8 , 8 , 8 , 5 , 8 },
-//            { 2 , 3 , 4 , 2 , 6 , 9 , 4 , 9 , 4 , 9 , 7 , 9 , 5 , 6 , 7 , 1 , 1 , 6 , 8 , 8 , 8 , 0 , 6 , 1 , 1 , 5 },
-//            { 3 , 3 , 5 , 7 , 4 , 5 , 4 , 1 , 8 , 7 , 8 , 7 , 7 , 2 , 1 , 3 , 8 , 4 , 1 , 4 , 8 , 6 , 0 , 3 , 7 , 6 },
-//            { 1 , 9 , 1 , 4 , 2 , 4 , 9 , 4 , 9 , 4 , 8 , 6 , 8 , 6 , 8 , 5 , 2 , 5 , 2 , 5 , 8 , 1 , 3 , 0 , 7 , 6 },
-//            { 4 , 6 , 9 , 5 , 8 , 9 , 5 , 8 , 8 , 7 , 1 , 7 , 4 , 8 , 2 , 1 , 3 , 3 , 7 , 9 , 5 , 1 , 7 , 7 , 0 , 7 },
-//            { 4 , 4 , 7 , 9 , 6 , 1 , 2 , 3 , 1 , 1 , 7 , 3 , 3 , 8 , 3 , 9 , 2 , 4 , 4 , 3 , 8 , 5 , 6 , 6 , 7 , 0 }
-//    };
-
-
+    //初始化打印值
+    SetOutPutMap(n);
 
     //初始化最优路径长度
     best_path.total_distance = 0;
 }
 
-uint32_t PostmanProblemSolver::GetPointIdx(const char &point) {
-    return point - 65;
+uint32_t PostmanProblemSolver::GetDistance(const uint32_t &point1, const uint32_t &point2) const {
+    return distanceMatrix.at(point1).at(point2);
 }
 
-uint32_t PostmanProblemSolver::GetDistance(const char &point1, const char &point2) const {
-
-    return distanceMatrix.at(GetPointIdx(point1)).at(GetPointIdx(point2));
-}
-
-void PostmanProblemSolver::PrintDistance(const char &point1, const char &point2) const {
-    std::cout << point1 << "<------" << GetDistance(point1, point2) << "------>" << point2 << std::endl;
+void PostmanProblemSolver::PrintDistance(const uint32_t &point1, const uint32_t &point2) const {
+    std::cout << out_put_string_map.at(point1)<< "<------" << GetDistance(point1, point2) << "------>" << out_put_string_map.at(point2) << std::endl;
 }
 
 void PostmanProblemSolver::PrintMatrix() const {
@@ -147,7 +116,6 @@ void PostmanProblemSolver::PrintMatrix() const {
         }
         std::cout << std::endl;
     }
-    cout << "----------------" << endl;
 }
 
 uint32_t PostmanProblemSolver::GetRandomNum(const int &min, const int &max) {
@@ -166,22 +134,21 @@ void PostmanProblemSolver::CreatPathIdx(uint32_t creat_num) {
         Path path;
         path.total_distance = 0;
         vector<uint32_t> path_idx_temp;
-        vector<char> path_temp;
-        vector<char> allPointTemp = allPoint;
+        vector<uint32_t> path_temp;
+        vector<uint32_t> allPointTemp = allPoint;
         int point_num = allPoint.size() - 1;
-
 
         //设置路程起点
         const uint32_t begin_point_idx = 0;
         path_idx_temp.push_back(begin_point_idx);
-        char creat_point = allPointTemp.at(begin_point_idx);
+        uint32_t creat_point = allPointTemp.at(begin_point_idx);
         path_temp.push_back(creat_point);
-        char begin_point = creat_point;
-        std::vector<char>::iterator it = allPointTemp.begin() + begin_point_idx;
+        uint32_t begin_point = creat_point;
+        auto it = allPointTemp.begin() + begin_point_idx;
         allPointTemp.erase(it);
 
         //设置路程点
-        char before_point = begin_point;
+        uint32_t before_point = begin_point;
         do {
             //生成索引
             auto idx = GetRandomNum(0, --point_num);
@@ -218,34 +185,18 @@ void PostmanProblemSolver::PrintPathIdx() const {
         }
         std::cout << std::endl;
     }
-    cout << "----------------" << endl;
 }
 
 void PostmanProblemSolver::PrintPath() const {
 
     for (const auto &row: paths) {
-        vector<char> allPointTemp = allPoint;
+        vector<uint32_t> allPointTemp = allPoint;
         for (auto element: row.path) {
-            std::cout << element << " ";
+            std::cout << out_put_string_map.at(element) << " ";
         }
-        cout << " " << row.total_distance;
+        cout << "\t长度:" << row.total_distance;
         std::cout << std::endl;
     }
-    cout << "----------------" << endl;
-}
-
-void PostmanProblemSolver::PrintMapPath() const {
-
-    for (const auto &row: paths) {
-        vector<char> allPointTemp = allPoint;
-        for (auto element: row.path) {
-            auto it = string_map.find(element);
-            std::cout << (it->second) << " ";
-        }
-        cout << " " << row.total_distance;
-        std::cout << std::endl;
-    }
-    cout << "----------------" << endl;
 }
 
 void PostmanProblemSolver::ChosePath() {
@@ -298,7 +249,7 @@ void PostmanProblemSolver::ChosePath() {
 }
 
 
-void PostmanProblemSolver::Hybrid() {
+void PostmanProblemSolver::Hybrid(const uint32_t &prob, const uint32_t &prob_total) {
 
     vector<Path> min_paths;
     vector<Path> hybrid_paths;
@@ -336,6 +287,14 @@ void PostmanProblemSolver::Hybrid() {
         for (auto idx = 0; idx < hybrid_paths.size(); idx += 2) {
             auto &path_a = hybrid_paths.at(idx);
             auto &path_b = hybrid_paths.at(idx + 1);
+            //概率发生杂交
+            if(GetRandomNum(1,prob_total)>prob)
+            {
+                paths.push_back(path_a);
+                paths.push_back(path_b);
+                continue;
+            }
+
             //总里程相等不杂交
             if (path_a.total_distance == path_b.total_distance) {
                 paths.push_back(path_a);
@@ -393,15 +352,10 @@ void PostmanProblemSolver::Mutation(const uint32_t &prob, const uint32_t &prob_t
         random = GetRandomNum(1, allPoint.size() - 1);
 
 
-        while (random < allPoint.size()) {
-            try {
-                auto new_point_idx = GetRandomNum(0, allPoint.size() - 1 - random);
-                path.path_idx.at(random) = new_point_idx;
-            } catch (const std::out_of_range &e) {
-                std::cerr << "在Mutation函数中出现越界访问: " << e.what() << std::endl;
-                // 可以根据情况选择合适的处理方式，比如直接返回、修正索引等
-                return;
-            }
+        while (random < allPoint.size())
+        {
+            auto new_point_idx = GetRandomNum(0, allPoint.size() - 1 - random);
+            path.path_idx.at(random) = new_point_idx;
             random++;
         }
         ResetPathWhenNewIdxGet(path);
@@ -440,17 +394,30 @@ void PostmanProblemSolver::ResetPathWhenNewIdxGet(Path &path) {
 }
 
 void PostmanProblemSolver::PrintBestPath() {
-    vector<char> allPointTemp = allPoint;
+    vector<uint32_t > allPointTemp = allPoint;
     for (auto element: best_path.path) {
-        std::cout << element << " ";
+        std::cout << out_put_string_map.at(element) << " ";
     }
-    cout << " " << best_path.total_distance;
+    cout << "\t长度:" << best_path.total_distance;
     std::cout << std::endl;
-    cout << "----------------" << endl;
 }
 
 uint32_t PostmanProblemSolver::GetBestPathTotalDistance() {
     return best_path.total_distance;
+}
+
+void PostmanProblemSolver::SetOutPutMap(const uint32_t map_size) {
+    for (uint32_t i = 0; i < map_size; ++i) {
+        if(i+1<10)
+        {
+            out_put_string_map[i] = "地点" +to_string(0) +to_string(i+1);
+        }
+        else
+        {
+            out_put_string_map[i] = "地点" + to_string(i+1);
+        }
+
+    }
 }
 
 

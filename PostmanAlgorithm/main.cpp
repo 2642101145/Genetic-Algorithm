@@ -30,6 +30,38 @@ vector<vector<uint32_t>> distanceMatrix = {
             { 4 , 4 , 7 , 9 , 6 , 1 , 2 , 3 , 1 , 1 , 7 , 3 , 3 , 8 , 3 , 9 , 2 , 4 , 4 , 3 , 8 , 5 , 6 , 6 , 7 , 0 }
     };
 
+void print_step(uint32_t step)
+{
+    switch (step) {
+        case 0:{
+            cout<<"--------------------打印矩阵信息--------------------";
+            break;
+        }
+        case 1:{
+            cout<<"--------------------创建初代成员--------------------";
+            break;
+        }
+        case 2:{
+            cout<<"--------------------开始遗传算法--------------------";
+            break;
+        }
+        case 3:{
+            cout<<"发现当前最短距离:";
+            break;
+        }
+        case 4:{
+            cout<<"--------------------运算结束------------------------"<<endl;
+            cout<<"--------------------结束时种群-----------------------";
+            break;
+        }
+        case 5:{
+            cout<<"--------------------本次运算最优解--------------------";
+            break;
+        }
+    }
+    cout<<endl;
+}
+
 
 int main() {
 
@@ -71,25 +103,27 @@ int main() {
     }
     reset_loop = loop;
 
-    cout<<"--------------------打印矩阵信息-----------------------"<<endl;
+
+    print_step(0);
     solver.PrintMatrix();
 
-    cout<<"--------------------创建初代成员-----------------------"<<endl;
+    print_step(1);
     solver.CreatPathIdx(10);
     solver.PrintPath();
 
     reset_loop = loop+1;
     best_path_total_distance =0;
+    print_step(2);
+
     do {
-        //cout<<"------------------loop"<< loop<<"---------------------"<<endl;
         //选择
         solver.ChosePath();
         //solver.PrintPath();
         //杂交
-        solver.Hybrid();
+        solver.Hybrid(80,100);
         //solver.PrintPath();
         //变异
-        solver.Mutation(60,100);
+        solver.Mutation(10,100);
         //solver.PrintPath();
         //solver.PrintBestPath();
         //初始化结束条件
@@ -103,7 +137,8 @@ int main() {
             {
                 best_path_total_distance = solver.GetBestPathTotalDistance();
                 //输出新的最优解最短路径
-                cout<<"当前最短距离:"<<best_path_total_distance<<endl;
+                print_step(3);
+                cout<<best_path_total_distance<<endl;
                 loop = reset_loop;
                 continue;
             }
@@ -111,12 +146,12 @@ int main() {
     }
     while(loop--);
 
-    cout<<"---------最终解------------"<<endl;
-    solver.PrintBestPath();
+    print_step(4);
     solver.PrintPath();
-    if(type==3){
-        solver.PrintMapPath();
-    }
+
+    print_step(5);
+    solver.PrintBestPath();
+
 
 
     return 0;
