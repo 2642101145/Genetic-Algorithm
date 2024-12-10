@@ -82,6 +82,8 @@ PostmanProblemSolver::PostmanProblemSolver(const vector<vector<uint32_t>> & dist
 }
 
 PostmanProblemSolver::PostmanProblemSolver(const std::vector<uint32_t> &points) : allPoint(points) {
+    random_device rd;
+    gen = std::mt19937(rd());
 
     //随机矩阵
     uint32_t n = allPoint.size();
