@@ -88,7 +88,7 @@ PostmanProblemSolver::PostmanProblemSolver(const std::vector<uint32_t> &points) 
     distanceMatrix = std::vector<std::vector<uint32_t>>(n, std::vector<uint32_t>(n, 0));
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
-            auto randomValue = PostmanProblemSolver::GetRandomNum(1, 30);
+            auto randomValue = PostmanProblemSolver::GetRandomNum(1, 999);
             distanceMatrix[i][j] = randomValue;
             distanceMatrix[j][i] = randomValue;  // 沿对角线对称
         }
@@ -112,7 +112,8 @@ void PostmanProblemSolver::PrintDistance(const uint32_t &point1, const uint32_t 
 void PostmanProblemSolver::PrintMatrix() const {
     for (const auto &row: distanceMatrix) {
         for (auto value: row) {
-            std::cout << value << " | ";
+            printf("%03d", value);
+            cout<< " | ";
         }
         std::cout << std::endl;
     }

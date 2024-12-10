@@ -66,6 +66,9 @@ void print_step(uint32_t step)
 int main() {
 
     uint32_t best_path_total_distance = 0;
+    //遗传、变异概率初始化
+    uint32_t hybrid_prob = 90, mutation_prob = 100;
+    const uint32_t  hybrid_total_prob = 100, mutation_total_prob = 10000;
 
     uint32_t loop = 0;
     auto reset_loop = loop;
@@ -77,7 +80,6 @@ int main() {
     switch (type) {
         case 1:
         {
-
             loop = 200000;
             PostmanProblemSolver static_26x26_solver(distanceMatrix);
             solver = static_26x26_solver;
@@ -120,10 +122,10 @@ int main() {
         solver.ChosePath();
         //solver.PrintPath();
         //杂交
-        solver.Hybrid(80,100);
+        solver.Hybrid(hybrid_prob,hybrid_total_prob);
         //solver.PrintPath();
         //变异
-        solver.Mutation(10,100);
+        solver.Mutation(mutation_prob,mutation_total_prob);
         //solver.PrintPath();
         //solver.PrintBestPath();
         //初始化结束条件
@@ -136,6 +138,7 @@ int main() {
             if(solver.GetBestPathTotalDistance()<best_path_total_distance)
             {
                 best_path_total_distance = solver.GetBestPathTotalDistance();
+
                 //输出新的最优解最短路径
                 print_step(3);
                 cout<<best_path_total_distance<<endl;

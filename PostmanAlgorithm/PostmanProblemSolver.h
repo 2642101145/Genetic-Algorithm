@@ -13,6 +13,7 @@
 #include <memory>
 #include "path.h"
 #include <string>
+#include <cstdio>
 
 using namespace std;
 
